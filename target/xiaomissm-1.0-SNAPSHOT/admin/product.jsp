@@ -222,7 +222,7 @@ alert(str+"11111111");
     function ajaxsplit(page) {
         //异步ajax分页请求
         $.ajax({
-        url:"${pageContext.request.contextPath}/prod/ajaxsplit.action",
+        url:"${pageContext.request.contextPath}/prod/ajaxSplit.action",
             data:{"page":page},
             type:"post",
             success:function () {
