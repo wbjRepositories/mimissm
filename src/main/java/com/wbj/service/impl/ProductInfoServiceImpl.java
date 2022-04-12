@@ -36,4 +36,19 @@ public class ProductInfoServiceImpl implements ProductInfoService {
         return pageInfo;
     }
 
+    @Override
+    public int save(ProductInfo info) {
+        return productInfoMapper.insert(info);
+    }
+
+    @Override
+    public ProductInfo getById(int pId) {
+        return productInfoMapper.selectByPrimaryKey(pId);
+    }
+
+    @Override
+    public int update(ProductInfo info) {
+        return productInfoMapper.updateByPrimaryKey(info);
+    }
+
 }
