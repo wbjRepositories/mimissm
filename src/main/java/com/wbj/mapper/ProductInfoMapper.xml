@@ -102,7 +102,7 @@
       <include refid="Example_Where_Clause" />
     </if>
   </delete>
-  <insert id="insert" parameterType="com.wbj.pojo.ProductInfo" >
+    <insert id="insert" parameterType="com.wbj.pojo.ProductInfo" >
     insert into product_info (p_id, p_name, p_content, 
       p_price, p_image, p_number, 
       type_id, p_date)
@@ -255,4 +255,35 @@
       p_date = #{pDate,jdbcType=DATE}
     where p_id = #{pId,jdbcType=INTEGER}
   </update>
+
+  <delete id="deleteBatch">
+    delete from product_info where p_id in
+    <foreach collection="array" item="pid" separator="," open="(" close=")">
+        #{pid}
+    </foreach>
+  </delete>
+  
+  <select id="selectCondition" parameterType="com.wbj.pojo.vo.ProductInfoVo" resultMap="BaseResultMap">
+    select <include refid="Base_Column_List"></include>
+    from product_info
+    <where>
+        <if test="pname != null and pname !=''">
+          and p_name like '%${pname}%'
+        </if>
+        <if test="typeid != null and typeid != -1">
+          and type_id = #{typeid}
+        </if>
+        <if test="(lprice != null and lprice != '') and (hprice == null or hprice == '')">
+          and p_price &gt; #{lprice}
+        </if>
+        <if test="(lprice == null or lprice == '') and (hprice != null and hprice != '')">
+          and p_price &lt; #{hprice}
+        </if>
+        <if test="(hprice != null and hprice != '') and (lprice != null and lprice != '')">
+          and p_price between #{lprice} and #{hprice}
+        </if>
+    </where>
+    order by p_id desc
+  </select>
+
 </mapper>

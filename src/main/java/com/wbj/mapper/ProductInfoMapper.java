@@ -2,6 +2,7 @@ package com.wbj.mapper;
 
 import com.wbj.pojo.ProductInfo;
 import com.wbj.pojo.ProductInfoExample;
+import com.wbj.pojo.vo.ProductInfoVo;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -28,4 +29,8 @@ public interface ProductInfoMapper {
     int updateByPrimaryKeySelective(ProductInfo record);
 
     int updateByPrimaryKey(ProductInfo record);
+
+    int deleteBatch(String[] ids);
+
+    List<ProductInfo> selectCondition(ProductInfoVo vo);
 }

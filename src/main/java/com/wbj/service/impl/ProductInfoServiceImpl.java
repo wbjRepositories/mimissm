@@ -5,6 +5,7 @@ import com.github.pagehelper.PageInfo;
 import com.wbj.mapper.ProductInfoMapper;
 import com.wbj.pojo.ProductInfo;
 import com.wbj.pojo.ProductInfoExample;
+import com.wbj.pojo.vo.ProductInfoVo;
 import com.wbj.service.ProductInfoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -49,6 +50,28 @@ public class ProductInfoServiceImpl implements ProductInfoService {
     @Override
     public int update(ProductInfo info) {
         return productInfoMapper.updateByPrimaryKey(info);
+    }
+
+    @Override
+    public int delete(int pid) {
+        return productInfoMapper.deleteByPrimaryKey(pid);
+    }
+
+    @Override
+    public int deleteBatch(String[] ids) {
+        return productInfoMapper.deleteBatch(ids);
+    }
+
+    @Override
+    public List<ProductInfo> selectCondition(ProductInfoVo vo) {
+        return productInfoMapper.selectCondition(vo);
+    }
+
+    @Override
+    public PageInfo<ProductInfo> splitPageVo(ProductInfoVo vo, int pageSize) {
+        PageHelper.startPage(vo.getPage(),pageSize);
+        List<ProductInfo> list = productInfoMapper.selectCondition(vo);
+        return new PageInfo<>(list);
     }
 
 }

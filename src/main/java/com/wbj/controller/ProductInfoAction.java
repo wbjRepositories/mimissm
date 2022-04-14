@@ -2,6 +2,7 @@ package com.wbj.controller;
 
 import com.github.pagehelper.PageInfo;
 import com.wbj.pojo.ProductInfo;
+import com.wbj.pojo.vo.ProductInfoVo;
 import com.wbj.service.ProductInfoService;
 import com.wbj.utils.FileNameUtil;
 import org.json.JSONObject;
@@ -38,15 +39,22 @@ public class ProductInfoAction {
 
     @RequestMapping("/split")
     public String split(HttpServletRequest request){
-        PageInfo pageInfo = productInfoService.split(1, PAGE_SIZE);
-        request.setAttribute("info",pageInfo);
+        PageInfo info = null;
+        Object vo = request.getSession().getAttribute("prodVo");
+        if(vo != null){
+            info = productInfoService.splitPageVo((ProductInfoVo)vo,PAGE_SIZE);
+            request.getSession().removeAttribute("prodVo");
+        }else {
+            info = productInfoService.split(1, PAGE_SIZE);
+        }
+        request.setAttribute("info",info);
         return "product";
     }
 
     @ResponseBody
     @RequestMapping("/ajaxSplit")
-    public void ajaxSplit(int page, HttpSession session){
-        PageInfo info = productInfoService.split(page, PAGE_SIZE);
+    public void ajaxSplit(ProductInfoVo vo, HttpSession session){
+        PageInfo info = productInfoService.splitPageVo(vo,PAGE_SIZE);
         session.setAttribute("info",info);
     }
 
@@ -84,9 +92,10 @@ public class ProductInfoAction {
     }
 
     @RequestMapping("/one")
-    public String one(int pid, Model model){
+    public String one(int pid,ProductInfoVo vo,Model model,HttpSession session){
         ProductInfo info = productInfoService.getById(pid);
         model.addAttribute("prod",info);
+        session.setAttribute("prodVo",vo);
         return "update";
     }
 
@@ -112,4 +121,53 @@ public class ProductInfoAction {
         return "forward:/prod/split.action";
     }
 
+    @RequestMapping("/delete")
+    public String delete(int pid,HttpServletRequest request){
+        int num = -1;
+        try {
+            num = productInfoService.delete(pid);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        if (num>0){
+            request.setAttribute("msg","删除成功");
+        }else {
+            request.setAttribute("msg","删除失败");
+        }
+
+        return "forward:/prod/deleteAjaxSplit.action";
+    }
+
+    @RequestMapping(value = "/deleteAjaxSplit",produces = "text/html;charset=UTF-8")
+    @ResponseBody
+    public Object deleteAjaxSplit(HttpServletRequest request){
+        PageInfo info = productInfoService.split(1,PAGE_SIZE);
+        request.getSession().setAttribute("info",info);
+        return request.getAttribute("msg");
+    }
+
+    @RequestMapping("/deleteBatch")
+    public String deleteBatch(String pids,HttpServletRequest request){
+        String[] ps = pids.split(",");
+        int num = -1;
+        try {
+            num = productInfoService.deleteBatch(ps);
+            if (num > 0){
+                request.setAttribute("msg","批量删除成功");
+            }else {
+                request.setAttribute("msg","批量删除失败");
+            }
+        } catch (Exception e) {
+            request.setAttribute("msg","商品不可删除");
+        }
+        return "forward:/prod/deleteAjaxSplit.action";
+    }
+
+    @ResponseBody
+    @RequestMapping("/condition")
+    public void condition(ProductInfoVo vo,HttpSession session){
+        List<ProductInfo> list = productInfoService.selectCondition(vo);
+        session.setAttribute("list",list);
+    }
 }

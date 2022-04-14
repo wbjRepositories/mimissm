@@ -3,7 +3,12 @@
         "http://mybatis.org/dtd/mybatis-3-config.dtd">
 <configuration>
     <!--没有和spring整合前这里可以写连接数据库的配置-->
-    
+
+
+    <settings>
+        <setting name="logImpl" value="STDOUT_LOGGING"/>
+    </settings>
+
     <!--这里表示分页插件-->
     <plugins>
         <plugin interceptor="com.github.pagehelper.PageInterceptor">
